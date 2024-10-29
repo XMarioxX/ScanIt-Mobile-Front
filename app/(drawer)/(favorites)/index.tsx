@@ -1,7 +1,7 @@
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { Button, Input } from 'tamagui';
-import { Pencil, Plus, Trash2, X } from 'lucide-react-native';
+import { Button, Input, Sheet } from 'tamagui';
+import { AlertTriangle, Pencil, Plus, Trash2, X } from 'lucide-react-native';
 import axios from 'axios';
 
 interface Proveedor {
@@ -19,6 +19,19 @@ const Page = () => {
   const [filteredData, setFilteredData] = useState<Proveedor[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [selectedProveedor, setSelectedProveedor] = useState<Proveedor | null>(null);
+  const [editFormData, setEditFormData] = useState<Partial<Proveedor>>({});
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [proveedorToDelete, setProveedorToDelete] = useState<Proveedor | null>(null);
+  const [createFormData, setCreateFormData] = useState<Partial<Proveedor>>({
+    nombre: '',
+    telefono: '',
+    direccion: '',
+    tipo: ''
+  });
+  
   const itemsPerPage = 4;
 
 
@@ -35,6 +48,61 @@ const Page = () => {
 
     fetchCalzadoData();
   }, []);
+
+  const handleUpdateProveedor = (item: Proveedor) => {
+    setSelectedProveedor(item);
+    setEditFormData({
+      nombre: item.nombre,
+      telefono: item.telefono,
+      direccion: item.direccion,
+      tipo: item.tipo
+    });
+    setEditModalVisible(true);
+  };
+
+  const handleSaveChanges = async () => {
+    if (!selectedProveedor?._id) return;
+
+    try {
+      const response = await axios.put(
+        `http://192.168.0.117:8000/zapateria/proveedor/update/${selectedProveedor._id}/`,
+        editFormData
+      );
+
+      // Actualizar la lista local
+      const updatedData = proveedorData.map(item =>
+        item._id === selectedProveedor._id ? { ...item, ...editFormData } : item
+      );
+      setProveedorData(updatedData);
+      setFilteredData(updatedData);
+
+      setEditModalVisible(false);
+    } catch (error: any) {
+      console.error('Error updating proveedor:', error.response ? error.response.data : error.message);
+    }
+  };
+
+  const handleDeleteProveedor = (item: Proveedor) => {
+    setProveedorToDelete(item);
+    setDeleteModalVisible(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!proveedorToDelete?._id) return;
+
+    try {
+      await axios.delete(`http://192.168.0.117:8000/zapateria/proveedor/delete/${proveedorToDelete._id}/`);
+      
+      const updatedData = proveedorData.filter(item => item._id !== proveedorToDelete._id);
+      setProveedorData(updatedData);
+      setFilteredData(updatedData);
+      
+      setDeleteModalVisible(false);
+      setProveedorToDelete(null);
+    } catch (error: any) {
+      console.error('Error deleting proveedor:', error.response ? error.response.data : error.message);
+    }
+  };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -75,6 +143,121 @@ const Page = () => {
   };
   return (
     <SafeAreaView style={styles.container}>
+      <Sheet
+        modal
+        open={editModalVisible}
+        onOpenChange={setEditModalVisible}
+        snapPoints={[60]}
+        position={0}
+        dismissOnSnapToBottom
+      >
+        <Sheet.Overlay />
+        <Sheet.Frame padding="$4">
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Editar Proveedor</Text>
+            <Text style={styles.modalEditText}>Nombre</Text>
+            <Input
+              size="$4"
+              style={styles.input}
+              placeholder="Nombre"
+              value={editFormData.nombre}
+              onChangeText={(text) => setEditFormData(prev => ({ ...prev, nombre: text }))}
+            />
+
+            <Text style={styles.modalEditText}>Teléfono</Text>
+            <Input
+              size="$4"
+              style={styles.input}
+              placeholder="Teléfono"
+              value={editFormData.telefono}
+              onChangeText={(text) => setEditFormData(prev => ({ ...prev, telefono: text }))}
+              keyboardType="phone-pad"
+            />
+
+            <Text style={styles.modalEditText}>Dirección</Text>
+            <Input
+              size="$4"
+              style={styles.input}
+              placeholder="Dirección"
+              value={editFormData.direccion}
+              onChangeText={(text) => setEditFormData(prev => ({ ...prev, direccion: text }))}
+            />
+
+            <Text style={styles.modalEditText}>Tipo</Text>
+            <Input
+              size="$4"
+              style={styles.input}
+              placeholder="Tipo"
+              value={editFormData.tipo}
+              onChangeText={(text) => setEditFormData(prev => ({ ...prev, tipo: text }))}
+            />
+
+            <View style={styles.modalButtons}>
+              <Button
+                size="$4"
+                variant="outlined"
+                style={styles.cancelButton}
+                onPress={() => setEditModalVisible(false)}
+              >
+                <Text style={styles.buttonText}>Cancelar</Text>
+              </Button>
+
+              <Button
+                size="$4"
+                variant="outlined"
+                style={styles.saveButton}
+                onPress={handleSaveChanges}
+              >
+                <Text style={styles.buttonText}>Guardar</Text>
+              </Button>
+            </View>
+          </View>
+        </Sheet.Frame>
+      </Sheet>
+      <Sheet
+        modal
+        open={deleteModalVisible}
+        onOpenChange={setDeleteModalVisible}
+        snapPoints={[30]}
+        position={0}
+        dismissOnSnapToBottom
+      >
+        <Sheet.Overlay />
+        <Sheet.Frame padding="$4">
+          <View style={styles.deleteModalContent}>
+            <View style={styles.warningIconContainer}>
+              <AlertTriangle color="red" size={50} />
+            </View>
+
+            <Text style={styles.deleteTitle}>Confirmar Eliminación</Text>
+            
+            <Text style={styles.deleteMessage}>
+              ¿Estás seguro que deseas eliminar al proveedor "{proveedorToDelete?.nombre}"?
+              Esta acción no se puede deshacer.
+            </Text>
+
+            <View style={styles.modalButtonsDelete}>
+              <Button
+                size="$4"
+                variant="outlined"
+                style={styles.cancelButton}
+                onPress={() => setDeleteModalVisible(false)}
+              >
+                <Text style={styles.buttonText}>Cancelar</Text>
+              </Button>
+              
+              <Button
+                size="$4"
+                variant="outlined"
+                style={styles.deleteButton}
+                onPress={confirmDelete}
+              >
+                <Text style={styles.buttonText}>Eliminar</Text>
+              </Button>
+            </View>
+          </View>
+        </Sheet.Frame>
+      </Sheet>
       <Text style={styles.headerText}>Lista de Proveedores</Text>
 
       <View style={styles.searchContainer}>
@@ -84,7 +267,7 @@ const Page = () => {
           value={searchQuery}
           onChangeText={handleSearch}
         />
-        {searchQuery.length > 0 && ( // Mostrar el botón solo si hay texto en el input
+        {searchQuery.length > 0 && (
           <TouchableOpacity>
             <Button icon={X} variant="outlined" size="$3" style={styles.btnTextDelete} onPress={handleDeleteSearch} />
           </TouchableOpacity>
@@ -105,10 +288,10 @@ const Page = () => {
                 <Text style={styles.cardTitle}>{item.nombre}</Text>
                 <View style={styles.buttonGroup}>
                   <TouchableOpacity>
-                    <Button icon={Pencil} variant="outlined" size="$3" style={styles.btnTextUpdate}/>
+                    <Button icon={Pencil} variant="outlined" size="$3" style={styles.btnTextUpdate} onPress={()=>handleUpdateProveedor(item)}/>
                   </TouchableOpacity>
                   <TouchableOpacity>
-                    <Button icon={Trash2} variant="outlined" size="$3" style={styles.btnTextDelete}/>
+                    <Button icon={Trash2} variant="outlined" size="$3" style={styles.btnTextDelete} onPress={() => handleDeleteProveedor(item)}/>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -261,4 +444,82 @@ const styles = StyleSheet.create({
     backgroundColor: 'blue',
     marginRight: 6,
   },
+  modalContent: {
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  input: {
+    marginBottom: 10,
+    color:'black',
+    backgroundColor: 'white',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+    paddingHorizontal: 10,
+    gap: 15,
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: 'red',
+    height: 45,
+    borderWidth: 0,
+  },
+  saveButton: {
+    flex: 1,
+    backgroundColor: 'blue',
+    height: 45,
+    borderWidth: 0,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  deleteModalContent: {
+    padding: 20,
+    alignItems: 'center',
+    height: 120,
+  },
+  warningIconContainer: {
+    marginBottom: 15,
+  },
+  deleteTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  deleteMessage: {
+    fontSize: 12,
+    color: 'gray',
+    textAlign: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 10,
+  },
+  deleteButton: {
+    flex: 1,
+    backgroundColor: 'red',
+    height: 45,
+    borderWidth: 0,
+  },
+  modalButtonsDelete: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 10,
+    gap: 15,
+  },
+  modalEditText:{
+    color:'white'
+  }
 });
