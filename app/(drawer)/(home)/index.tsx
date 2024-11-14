@@ -37,7 +37,7 @@ const Page = () => {
   useEffect(() => {
       const fetchCalzadoData = async () => {
           try {
-              const response = await axios.get('http://192.168.0.117:8000/zapateria/calzado/all/');
+              const response = await axios.get('http://192.168.34.53:8000/zapateria/calzado/all/');
               setCalzadoData(response.data);
               setFilteredData(response.data);
           } catch (error: any) {
@@ -102,7 +102,7 @@ const Page = () => {
     if (!selectedCalzado?._id) return;
 
     try {
-      await axios.put(`http://192.168.0.117:8000/zapateria/calzado/update/${selectedCalzado._id}/`, editFormData);
+      await axios.put(`http://192.168.34.53:8000/zapateria/calzado/update/${selectedCalzado._id}/`, editFormData);
       
       // Actualizar la lista local
       const updatedData = calzadoData.map(item => 
@@ -129,7 +129,7 @@ const Page = () => {
     if (!calzadoToDelete?._id) return;
 
     try {
-      await axios.delete(`http://192.168.0.117:8000/zapateria/calzado/delete/${calzadoToDelete._id}/`);
+      await axios.delete(`http://192.168.34.53:8000/zapateria/calzado/delete/${calzadoToDelete._id}/`);
       
       // Actualizar la lista local removiendo el item eliminado
       const updatedData = calzadoData.filter(item => item._id !== calzadoToDelete._id);

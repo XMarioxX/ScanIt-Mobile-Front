@@ -31,14 +31,14 @@ const Page = () => {
     direccion: '',
     tipo: ''
   });
-  
+
   const itemsPerPage = 4;
 
 
   useEffect(() => {
     const fetchCalzadoData = async () => {
       try {
-        const response = await axios.get('http://192.168.0.117:8000/zapateria/proveedor/all/');
+        const response = await axios.get('http://192.168.34.53:8000/zapateria/proveedor/all/');
         setProveedorData(response.data);
         setFilteredData(response.data);
       } catch (error: any) {
@@ -65,7 +65,7 @@ const Page = () => {
 
     try {
       const response = await axios.put(
-        `http://192.168.0.117:8000/zapateria/proveedor/update/${selectedProveedor._id}/`,
+        `http://192.168.34.53:8000/zapateria/proveedor/update/${selectedProveedor._id}/`,
         editFormData
       );
 
@@ -91,16 +91,51 @@ const Page = () => {
     if (!proveedorToDelete?._id) return;
 
     try {
-      await axios.delete(`http://192.168.0.117:8000/zapateria/proveedor/delete/${proveedorToDelete._id}/`);
-      
+      await axios.delete(`http://192.168.34.53:8000/zapateria/proveedor/delete/${proveedorToDelete._id}/`);
+
       const updatedData = proveedorData.filter(item => item._id !== proveedorToDelete._id);
       setProveedorData(updatedData);
       setFilteredData(updatedData);
-      
+
       setDeleteModalVisible(false);
       setProveedorToDelete(null);
     } catch (error: any) {
       console.error('Error deleting proveedor:', error.response ? error.response.data : error.message);
+    }
+  };
+
+  const handleCreateProveedor = async () => {
+    // Validar que todos los campos requeridos estén llenos
+    if (!createFormData.nombre || !createFormData.telefono || !createFormData.direccion || !createFormData.tipo) {
+      console.error('Todos los campos son requeridos');
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        'http://192.168.34.53:8000/zapateria/proveedor/add/',
+        createFormData
+      );
+
+      // Verificar que la respuesta tenga datos válidos
+      if (response.data) {
+        const refreshResponse = await axios.get('http://192.168.34.53:8000/zapateria/proveedor/all/');
+        setProveedorData(refreshResponse.data);
+        setFilteredData(refreshResponse.data);
+
+        // Limpiar el formulario y cerrar el modal
+        setCreateFormData({
+          nombre: '',
+          telefono: '',
+          direccion: '',
+          tipo: ''
+        });
+        setCreateModalVisible(false);
+      } else {
+        console.error('La respuesta del servidor no incluye un ID válido');
+      }
+    } catch (error: any) {
+      console.error('Error creating proveedor:', error.response ? error.response.data : error.message);
     }
   };
 
@@ -138,9 +173,10 @@ const Page = () => {
     setCurrentPage(1); // Reiniciar la página al borrar la búsqueda
   };
 
-  const handleIconPress = () => {
-    console.log("Otra pagina siuuu");
+  const handleCreatePress = () => {
+    setCreateModalVisible(true);
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <Sheet
@@ -230,7 +266,7 @@ const Page = () => {
             </View>
 
             <Text style={styles.deleteTitle}>Confirmar Eliminación</Text>
-            
+
             <Text style={styles.deleteMessage}>
               ¿Estás seguro que deseas eliminar al proveedor "{proveedorToDelete?.nombre}"?
               Esta acción no se puede deshacer.
@@ -245,7 +281,7 @@ const Page = () => {
               >
                 <Text style={styles.buttonText}>Cancelar</Text>
               </Button>
-              
+
               <Button
                 size="$4"
                 variant="outlined"
@@ -258,6 +294,87 @@ const Page = () => {
           </View>
         </Sheet.Frame>
       </Sheet>
+      <Sheet
+        modal
+        open={createModalVisible}
+        onOpenChange={setCreateModalVisible}
+        snapPoints={[60]}
+        position={0}
+        dismissOnSnapToBottom
+      >
+        <Sheet.Overlay />
+        <Sheet.Frame padding="$4">
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Agregar Nuevo Proveedor</Text>
+
+            <Text style={styles.modalEditText}>Nombre</Text>
+            <Input
+              size="$4"
+              style={styles.input}
+              placeholder="Nombre"
+              value={createFormData.nombre}
+              onChangeText={(text) => setCreateFormData(prev => ({ ...prev, nombre: text }))}
+            />
+
+            <Text style={styles.modalEditText}>Teléfono</Text>
+            <Input
+              size="$4"
+              style={styles.input}
+              placeholder="Teléfono"
+              value={createFormData.telefono}
+              onChangeText={(text) => setCreateFormData(prev => ({ ...prev, telefono: text }))}
+              keyboardType="phone-pad"
+            />
+
+            <Text style={styles.modalEditText}>Dirección</Text>
+            <Input
+              size="$4"
+              style={styles.input}
+              placeholder="Dirección"
+              value={createFormData.direccion}
+              onChangeText={(text) => setCreateFormData(prev => ({ ...prev, direccion: text }))}
+            />
+
+            <Text style={styles.modalEditText}>Estado</Text>
+            <Input
+              size="$4"
+              style={styles.input}
+              placeholder="Estado"
+              value={createFormData.tipo}
+              onChangeText={(text) => setCreateFormData(prev => ({ ...prev, tipo: text }))}
+            />
+
+            <View style={styles.modalButtons}>
+              <Button
+                size="$4"
+                variant="outlined"
+                style={styles.cancelButton}
+                onPress={() => {
+                  setCreateModalVisible(false);
+                  setCreateFormData({
+                    nombre: '',
+                    telefono: '',
+                    direccion: '',
+                    tipo: ''
+                  });
+                }}
+              >
+                <Text style={styles.buttonText}>Cancelar</Text>
+              </Button>
+
+              <Button
+                size="$4"
+                variant="outlined"
+                style={styles.saveButton}
+                onPress={handleCreateProveedor}
+              >
+                <Text style={styles.buttonText}>Crear</Text>
+              </Button>
+            </View>
+          </View>
+        </Sheet.Frame>
+      </Sheet>
+
       <Text style={styles.headerText}>Lista de Proveedores</Text>
 
       <View style={styles.searchContainer}>
@@ -268,14 +385,22 @@ const Page = () => {
           onChangeText={handleSearch}
         />
         {searchQuery.length > 0 && (
-          <TouchableOpacity>
-            <Button icon={X} variant="outlined" size="$3" style={styles.btnTextDelete} onPress={handleDeleteSearch} />
-          </TouchableOpacity>
+          <Button
+            icon={<X color="white" />}
+            variant="outlined"
+            size="$3"
+            style={styles.btnTextDelete}
+            onPress={handleDeleteSearch}
+          />
         )}
 
-        <TouchableOpacity onPress={handleIconPress}>
-          <Button icon={Plus} variant="outlined" size="$3" style={styles.btnText} />
-        </TouchableOpacity>
+        <Button
+          icon={<Plus color="white" />}
+          variant="outlined"
+          size="$3"
+          style={styles.btnText}
+          onPress={handleCreatePress}
+        />
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
@@ -288,10 +413,10 @@ const Page = () => {
                 <Text style={styles.cardTitle}>{item.nombre}</Text>
                 <View style={styles.buttonGroup}>
                   <TouchableOpacity>
-                    <Button icon={Pencil} variant="outlined" size="$3" style={styles.btnTextUpdate} onPress={()=>handleUpdateProveedor(item)}/>
+                    <Button icon={Pencil} variant="outlined" size="$3" style={styles.btnTextUpdate} onPress={() => handleUpdateProveedor(item)} />
                   </TouchableOpacity>
                   <TouchableOpacity>
-                    <Button icon={Trash2} variant="outlined" size="$3" style={styles.btnTextDelete} onPress={() => handleDeleteProveedor(item)}/>
+                    <Button icon={Trash2} variant="outlined" size="$3" style={styles.btnTextDelete} onPress={() => handleDeleteProveedor(item)} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -456,7 +581,7 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 10,
-    color:'black',
+    color: 'black',
     backgroundColor: 'white',
   },
   modalButtons: {
@@ -519,7 +644,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     gap: 15,
   },
-  modalEditText:{
-    color:'white'
+  modalEditText: {
+    color: 'white'
   }
 });
