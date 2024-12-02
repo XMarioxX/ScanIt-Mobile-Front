@@ -5,8 +5,8 @@ import Drawer from 'expo-router/drawer';
 const Layout = () => {
   return (
     <Drawer>
-      <Drawer.Screen name='(home)/index' options={{ title: 'Calzado' }} />
-      <Drawer.Screen name='(favorites)/index' options={{ title: 'Proveedores' }} />
+      <Drawer.Screen name='(calzado)/index' options={{ title: 'Calzado' }} />
+      <Drawer.Screen name='(proveedores)/index' options={{ title: 'Proveedores' }} />
     </Drawer>
   );
 }

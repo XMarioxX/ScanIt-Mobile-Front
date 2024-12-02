@@ -1,6 +1,7 @@
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Button, Input, Sheet } from 'tamagui';
+import tw from 'twrnc';
 import { AlertTriangle, Pencil, Plus, Trash2, X } from 'lucide-react-native';
 import axios from 'axios';
 
@@ -178,7 +179,7 @@ const Page = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={tw`flex-1 mt-8 px-4 pt-5 rounded-lg overflow-hidden`}>
       <Sheet
         modal
         open={editModalVisible}
@@ -189,62 +190,62 @@ const Page = () => {
       >
         <Sheet.Overlay />
         <Sheet.Frame padding="$4">
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Editar Proveedor</Text>
-            <Text style={styles.modalEditText}>Nombre</Text>
+          <View style={tw`p-5`}>
+            <Text style={tw`text-2xl font-bold text-white mb-5 text-center`}>Editar Proveedor</Text>
+            <Text style={tw`text-white`}>Nombre</Text>
             <Input
               size="$4"
-              style={styles.input}
+              style={tw`mb-2.5 text-black bg-white`}
               placeholder="Nombre"
               value={editFormData.nombre}
               onChangeText={(text) => setEditFormData(prev => ({ ...prev, nombre: text }))}
             />
 
-            <Text style={styles.modalEditText}>Teléfono</Text>
+            <Text style={tw`text-white`}>Teléfono</Text>
             <Input
               size="$4"
-              style={styles.input}
+              style={tw`mb-2.5 text-black bg-white`}
               placeholder="Teléfono"
               value={editFormData.telefono}
               onChangeText={(text) => setEditFormData(prev => ({ ...prev, telefono: text }))}
               keyboardType="phone-pad"
             />
 
-            <Text style={styles.modalEditText}>Dirección</Text>
+            <Text style={tw`text-white`}>Dirección</Text>
             <Input
               size="$4"
-              style={styles.input}
+              style={tw`mb-2.5 text-black bg-white`}
               placeholder="Dirección"
               value={editFormData.direccion}
               onChangeText={(text) => setEditFormData(prev => ({ ...prev, direccion: text }))}
             />
 
-            <Text style={styles.modalEditText}>Tipo</Text>
+            <Text style={tw`text-white`}>Tipo</Text>
             <Input
               size="$4"
-              style={styles.input}
+              style={tw`mb-2.5 text-black bg-white`}
               placeholder="Tipo"
               value={editFormData.tipo}
               onChangeText={(text) => setEditFormData(prev => ({ ...prev, tipo: text }))}
             />
 
-            <View style={styles.modalButtons}>
+            <View style={tw`flex-row justify-between mt-5 px-2.5 gap-4`}>
               <Button
                 size="$4"
                 variant="outlined"
-                style={styles.cancelButton}
+                style={tw` flex-1 bg-red-500 h-[45px] border-0`}
                 onPress={() => setEditModalVisible(false)}
               >
-                <Text style={styles.buttonText}>Cancelar</Text>
+                <Text style={tw` text-white text-base font-bold text-center`}>Cancelar</Text>
               </Button>
 
               <Button
                 size="$4"
                 variant="outlined"
-                style={styles.saveButton}
+                style={tw` flex-1 bg-blue-500 h-[45px] border-0`}
                 onPress={handleSaveChanges}
               >
-                <Text style={styles.buttonText}>Guardar</Text>
+                <Text style={tw` text-white text-base font-bold text-center`}>Guardar</Text>
               </Button>
             </View>
           </View>
@@ -260,35 +261,35 @@ const Page = () => {
       >
         <Sheet.Overlay />
         <Sheet.Frame padding="$4">
-          <View style={styles.deleteModalContent}>
-            <View style={styles.warningIconContainer}>
+          <View style={tw`p-5 items-center h-[120px]`}>
+            <View style={tw`mb-4`}>
               <AlertTriangle color="red" size={50} />
             </View>
 
-            <Text style={styles.deleteTitle}>Confirmar Eliminación</Text>
+            <Text style={tw`text-2xl font-bold text-white mb-4 text-center`}>Confirmar Eliminación</Text>
 
-            <Text style={styles.deleteMessage}>
+            <Text style={tw`text-xs text-gray-500 text-center mb-5 px-2.5`}>
               ¿Estás seguro que deseas eliminar al proveedor "{proveedorToDelete?.nombre}"?
               Esta acción no se puede deshacer.
             </Text>
 
-            <View style={styles.modalButtonsDelete}>
+            <View style={tw`flex-row justify-between w-full px-2.5 gap-4`}>
               <Button
                 size="$4"
                 variant="outlined"
-                style={styles.cancelButton}
+                style={tw` flex-1 bg-red-500 h-[45px] border-0`}
                 onPress={() => setDeleteModalVisible(false)}
               >
-                <Text style={styles.buttonText}>Cancelar</Text>
+                <Text style={tw` text-white text-base font-bold text-center`}>Cancelar</Text>
               </Button>
 
               <Button
                 size="$4"
                 variant="outlined"
-                style={styles.deleteButton}
+                style={tw`flex-1 bg-red-500 h-[45px] border-0`}
                 onPress={confirmDelete}
               >
-                <Text style={styles.buttonText}>Eliminar</Text>
+                <Text style={tw` text-white text-base font-bold text-center`}>Eliminar</Text>
               </Button>
             </View>
           </View>
@@ -304,51 +305,51 @@ const Page = () => {
       >
         <Sheet.Overlay />
         <Sheet.Frame padding="$4">
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Agregar Nuevo Proveedor</Text>
+          <View style={tw`p-5`}>
+            <Text style={tw`text-2xl font-bold text-white mb-5 text-center`}>Agregar Nuevo Proveedor</Text>
 
-            <Text style={styles.modalEditText}>Nombre</Text>
+            <Text style={tw`text-white`}>Nombre</Text>
             <Input
               size="$4"
-              style={styles.input}
+              style={tw`mb-2.5 text-black bg-white`}
               placeholder="Nombre"
               value={createFormData.nombre}
               onChangeText={(text) => setCreateFormData(prev => ({ ...prev, nombre: text }))}
             />
 
-            <Text style={styles.modalEditText}>Teléfono</Text>
+            <Text style={tw`text-white`}>Teléfono</Text>
             <Input
               size="$4"
-              style={styles.input}
+              style={tw`mb-2.5 text-black bg-white`}
               placeholder="Teléfono"
               value={createFormData.telefono}
               onChangeText={(text) => setCreateFormData(prev => ({ ...prev, telefono: text }))}
               keyboardType="phone-pad"
             />
 
-            <Text style={styles.modalEditText}>Dirección</Text>
+            <Text style={tw`text-white`}>Dirección</Text>
             <Input
               size="$4"
-              style={styles.input}
+              style={tw`mb-2.5 text-black bg-white`}
               placeholder="Dirección"
               value={createFormData.direccion}
               onChangeText={(text) => setCreateFormData(prev => ({ ...prev, direccion: text }))}
             />
 
-            <Text style={styles.modalEditText}>Estado</Text>
+            <Text style={tw`text-white`}>Estado</Text>
             <Input
               size="$4"
-              style={styles.input}
+              style={tw`mb-2.5 text-black bg-white`}
               placeholder="Estado"
               value={createFormData.tipo}
               onChangeText={(text) => setCreateFormData(prev => ({ ...prev, tipo: text }))}
             />
 
-            <View style={styles.modalButtons}>
+            <View style={tw`flex-row justify-between mt-5 px-2.5 gap-4`}>
               <Button
                 size="$4"
                 variant="outlined"
-                style={styles.cancelButton}
+                style={tw` flex-1 bg-red-500 h-[45px] border-0`}
                 onPress={() => {
                   setCreateModalVisible(false);
                   setCreateFormData({
@@ -359,27 +360,27 @@ const Page = () => {
                   });
                 }}
               >
-                <Text style={styles.buttonText}>Cancelar</Text>
+                <Text style={tw` text-white text-base font-bold text-center`}>Cancelar</Text>
               </Button>
 
               <Button
                 size="$4"
                 variant="outlined"
-                style={styles.saveButton}
+                style={tw` flex-1 bg-blue-500 h-[45px] border-0`}
                 onPress={handleCreateProveedor}
               >
-                <Text style={styles.buttonText}>Crear</Text>
+                <Text style={tw` text-white text-base font-bold text-center`}>Crear</Text>
               </Button>
             </View>
           </View>
         </Sheet.Frame>
       </Sheet>
 
-      <Text style={styles.headerText}>Lista de Proveedores</Text>
+      <Text style={tw`text-2xl font-bold text-black mb-2.5`}>Lista de Proveedores</Text>
 
-      <View style={styles.searchContainer}>
+      <View style={tw`flex-row items-center mb-5`}>
         <Input
-          style={styles.searchInput}
+          style={tw`flex-1 h-10 border border-black rounded-lg px-2 text-black bg-white mr-2.5`}
           placeholder="Buscar por nombre"
           value={searchQuery}
           onChangeText={handleSearch}
@@ -389,7 +390,7 @@ const Page = () => {
             icon={<X color="white" />}
             variant="outlined"
             size="$3"
-            style={styles.btnTextDelete}
+            style={tw`text-white text-xl bg-red-500 mr-1.5`}
             onPress={handleDeleteSearch}
           />
         )}
@@ -398,55 +399,55 @@ const Page = () => {
           icon={<Plus color="white" />}
           variant="outlined"
           size="$3"
-          style={styles.btnText}
+          style={tw`text-white text-xl bg-black`}
           onPress={handleCreatePress}
         />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+      <ScrollView contentContainerStyle={tw`pb-5`}>
         {currentData.length === 0 ? (
-          <Text style={styles.noDataText}>Sin datos para mostrar</Text>
+          <Text style={tw`text-black text-center mt-5 text-lg`}>Sin datos para mostrar</Text>
         ) : (
           currentData.map((item) => (
-            <View key={item._id} style={styles.card}>
-              <View style={styles.cardRow}>
-                <Text style={styles.cardTitle}>{item.nombre}</Text>
-                <View style={styles.buttonGroup}>
+            <View key={item._id} style={tw`mt-5 border-2 border-black rounded-lg p-4 shadow-lg`}>
+              <View style={tw`flex-row items-center justify-between`}>
+                <Text style={tw`text-lg font-bold text-black mb-2`}>{item.nombre}</Text>
+                <View style={tw`flex-row items-center`}>
                   <TouchableOpacity>
-                    <Button icon={Pencil} variant="outlined" size="$3" style={styles.btnTextUpdate} onPress={() => handleUpdateProveedor(item)} />
+                    <Button icon={<Pencil/>} variant="outlined" size="$3" style={tw`text-white text-xl bg-blue-500 mr-1.5`} onPress={() => handleUpdateProveedor(item)} />
                   </TouchableOpacity>
                   <TouchableOpacity>
-                    <Button icon={Trash2} variant="outlined" size="$3" style={styles.btnTextDelete} onPress={() => handleDeleteProveedor(item)} />
+                    <Button icon={<Trash2/>} variant="outlined" size="$3" style={tw`text-white text-xl bg-red-500 mr-1.5`} onPress={() => handleDeleteProveedor(item)} />
                   </TouchableOpacity>
                 </View>
               </View>
-              <Text style={styles.cardText}>Teléfono: {item.telefono}</Text>
-              <Text style={styles.cardText}>Dirección: {item.direccion}</Text>
-              <Text style={styles.cardText}>Fecha de Creación: {new Date(item.fechaCreate).toLocaleDateString()}</Text>
-              <Text style={styles.cardText}>Fecha de Actualización: {new Date(item.fechaUpdate).toLocaleDateString()}</Text>
-              <Text style={styles.cardText}>Estado: {item.tipo}</Text>
+              <Text style={tw`text-black mb-4`}>Teléfono: {item.telefono}</Text>
+              <Text style={tw`text-black mb-4`}>Dirección: {item.direccion}</Text>
+              <Text style={tw`text-black mb-4`}>Fecha de Creación: {new Date(item.fechaCreate).toLocaleDateString()}</Text>
+              <Text style={tw`text-black mb-4`}>Fecha de Actualización: {new Date(item.fechaUpdate).toLocaleDateString()}</Text>
+              <Text style={tw`text-black mb-4`}>Estado: {item.tipo}</Text>
             </View>
           ))
         )}
       </ScrollView>
 
-      <View style={styles.pagination}>
+      <View style={tw`flex-row justify-between items-center mt-5`}>
         <TouchableOpacity
-          style={styles.pageButton}
+          style={tw`p-2.5 bg-black rounded-md`}
           onPress={handlePreviousPage}
           disabled={currentPage === 1}
         >
-          <Text style={styles.pageButtonText}>Anterior</Text>
+          <Text style={tw`text-white font-bold`}>Anterior</Text>
         </TouchableOpacity>
-        <Text style={styles.pageText}>
+        <Text style={tw`text-black text-base`}>
           Página {currentPage} de {totalPages}
         </Text>
         <TouchableOpacity
-          style={styles.pageButton}
+          style={tw`p-2.5 bg-black rounded-md`}
           onPress={handleNextPage}
           disabled={currentPage === totalPages}
         >
-          <Text style={styles.pageButtonText}>Siguiente</Text>
+          <Text style={tw`text-white font-bold`}>Siguiente</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -454,197 +455,3 @@ const Page = () => {
 }
 
 export default Page
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginTop: 30,
-    paddingHorizontal: 16,
-    paddingTop: 20,
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-  clearButtonText: {
-    color: 'black',
-    fontWeight: 'bold',
-  },
-  scrollViewContent: {
-    paddingBottom: 20,
-  },
-  headerText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'black',
-    marginBottom: 10,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  searchInput: {
-    flex: 1,
-    height: 40,
-    borderColor: 'black',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    color: 'black',
-    backgroundColor: 'white',
-    marginRight: 10,
-  },
-  card: {
-    marginTop: 20,
-    borderWidth: 2,
-    borderColor: 'black',
-    borderRadius: 10,
-    padding: 16,
-    shadowColor: '#fff',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'black',
-    marginBottom: 8,
-  },
-  cardText: {
-    color: 'black',
-    marginBottom: 4,
-  },
-  noDataText: {
-    color: 'black',
-    textAlign: 'center',
-    marginTop: 20,
-    fontSize: 18,
-  },
-  pagination: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  pageButton: {
-    padding: 10,
-    backgroundColor: 'black',
-    borderRadius: 5,
-  },
-  pageButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  pageText: {
-    color: 'black',
-    fontSize: 16,
-  },
-  btnText: {
-    color: 'white',
-    fontSize: 20,
-    backgroundColor: 'black'
-  },
-  btnTextDelete: {
-    color: 'white',
-    fontSize: 20,
-    backgroundColor: 'red',
-    marginRight: 6,
-  },
-  cardRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  buttonGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  btnTextUpdate: {
-    color: 'white',
-    fontSize: 20,
-    backgroundColor: 'blue',
-    marginRight: 6,
-  },
-  modalContent: {
-    padding: 20,
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  input: {
-    marginBottom: 10,
-    color: 'black',
-    backgroundColor: 'white',
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
-    paddingHorizontal: 10,
-    gap: 15,
-  },
-  cancelButton: {
-    flex: 1,
-    backgroundColor: 'red',
-    height: 45,
-    borderWidth: 0,
-  },
-  saveButton: {
-    flex: 1,
-    backgroundColor: 'blue',
-    height: 45,
-    borderWidth: 0,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  deleteModalContent: {
-    padding: 20,
-    alignItems: 'center',
-    height: 120,
-  },
-  warningIconContainer: {
-    marginBottom: 15,
-  },
-  deleteTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  deleteMessage: {
-    fontSize: 12,
-    color: 'gray',
-    textAlign: 'center',
-    marginBottom: 20,
-    paddingHorizontal: 10,
-  },
-  deleteButton: {
-    flex: 1,
-    backgroundColor: 'red',
-    height: 45,
-    borderWidth: 0,
-  },
-  modalButtonsDelete: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingHorizontal: 10,
-    gap: 15,
-  },
-  modalEditText: {
-    color: 'white'
-  }
-});
