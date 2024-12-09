@@ -2,9 +2,10 @@ import { Pencil, Trash2, ShoppingCart } from 'lucide-react-native'
 import { Button } from 'tamagui'
 import React, { useEffect, useState, createContext, useContext, useCallback } from 'react'
 import tw from 'twrnc'
-import { ScrollView, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native'
+import { ScrollView, Text, TouchableOpacity, View, ActivityIndicator, Image, ImageBackground } from 'react-native'
 import axios from 'axios'
 import BarcodeGenerator from '../global/BarCodeGenerator'
+
 const ip = "192.168.0.187"
 
 // Interfaces
@@ -30,9 +31,11 @@ interface ICalzado {
   descripcion: string;
   precio_compra: number;
   precio_venta: number;
+  imagen_url?: string;
+  imagen_public_id?: string;
   variantes: string[];
   proveedor?: IProveedor;
-  proveedores_ids: string[];
+  proveedores_ids?: string[];
   estado: string;
   fecha_registro: string;
   createdAt: string;
@@ -74,6 +77,9 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
 
+  useEffect(() => {
+    console.log('Cart:', cart);
+  }, [cart]);
   const addToCart = useCallback((item: ICalzado) => {
     setCart(currentCart => {
       const existingItem = currentCart.find(cartItem => cartItem._id === item._id);
@@ -114,7 +120,7 @@ export const useCart = () => {
 // Cart Icon Component
 const CartIcon = () => {
   const { totalItems } = useCart();
-  
+
   return (
     <TouchableOpacity style={tw`relative`}>
       <ShoppingCart size={24} color="black" />
@@ -142,13 +148,13 @@ const TableRow = ({ label, value }: { label: string; value: string | number }) =
 // Estado Indicator Component
 const EstadoIndicator = ({ estado }: { estado: string }) => {
   const getBackgroundColor = (estado: string) => {
-    switch (estado) {
-      case 'disponible':
+    switch (estado.toLowerCase()) {
+      case 'activo':
         return 'bg-green-300';
-      case 'agotado':
+      case 'inactivo':
         return 'bg-red-200';
       default:
-        return '';
+        return 'bg-gray-200';
     }
   };
 
@@ -173,7 +179,7 @@ const CardCalzadoContent = () => {
 
   const fetchCalzados = async () => {
     try {
-      const response = await axios.get<ApiResponse>(`http://${ip}:3000/api/calzado`);
+      const response = await axios.get<ApiResponse>(`http://${ip}:3000/api/calzado?page=1&perPage=2`);
       setCalzados(response.data.data);
       setError(null);
     } catch (err) {
@@ -261,8 +267,20 @@ const CardCalzadoContent = () => {
 
               {/* Contenido Principal */}
               <View style={tw`flex-row mb-4`}>
-                <View style={tw`w-1/3 bg-gray-100 rounded-lg mr-2 h-32 items-center justify-center`}>
-                  <Text style={tw`text-gray-500`}>Foto</Text>
+                <View style={tw`w-1/3 bg-gray-100 rounded-lg mr-2 h-32`}>
+                  {item.imagen_url ? (
+                    <ImageBackground
+                      source={{ uri: item.imagen_url }}
+                      style={tw`w-full h-full`}
+                      resizeMode="cover"
+                    >
+                      {/* Contenido sobre la imagen */}
+                    </ImageBackground>
+                  ) : (
+                    <View style={tw`w-full h-full items-center justify-center`}>
+                      <Text style={tw`text-gray-500`}>Sin imagen</Text>
+                    </View>
+                  )}
                 </View>
 
                 <View style={tw`w-2/3 border border-gray-200 rounded-lg overflow-hidden`}>
@@ -277,13 +295,6 @@ const CardCalzadoContent = () => {
                 <EstadoIndicator estado={item.estado} />
               </View>
 
-              <View style={tw`mb-4 border border-gray-200 rounded-lg p-2`}>
-                <Text style={tw`text-black font-bold text-center mb-2`}>Colores Disponibles</Text>
-                <View style={tw`flex-row justify-center`}>
-                  <Text style={tw`text-gray-500`}>Sección de colores aquí</Text>
-                </View>
-              </View>
-
               {item.proveedor && (
                 <View style={tw`mb-4 border border-gray-200 rounded-lg overflow-hidden`}>
                   <Text style={tw`text-black font-bold text-center py-2 bg-gray-50`}>
@@ -291,6 +302,9 @@ const CardCalzadoContent = () => {
                   </Text>
                   <TableRow label="Nombre" value={item.proveedor.nombre} />
                   <TableRow label="Email" value={item.proveedor.email} />
+                  <TableRow label="Teléfono" value={item.proveedor.telefonos[0] || 'N/A'} />
+                  <TableRow label="RFC" value={item.proveedor.rfc} />
+                  <TableRow label="Dirección" value={item.proveedor.direccion} />
                 </View>
               )}
 
@@ -301,7 +315,7 @@ const CardCalzadoContent = () => {
 
               <View style={tw`items-center mt-4`}>
                 <Text style={tw`text-black font-bold mb-2`}>Código de Barras</Text>
-                <BarcodeGenerator value={`${item.codigo_barras}`} height={50}/>
+                <BarcodeGenerator value={item.codigo_barras} height={50} />
               </View>
             </View>
           ))
