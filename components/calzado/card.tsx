@@ -26,8 +26,9 @@ import BarcodeGenerator from '../global/BarCodeGenerator';
 import ModalSearchCalzado from './modalSearchCalzado';
 import ModalAddCalzado from './modalAddCalzado';
 import ModalCardCalzado from './modalCardCalzado';
+import EventRegister from './events';
 
-const ip = '192.168.0.187';
+const ip = '10.31.7.47';
 
 // Interfaces
 interface IProveedor {
@@ -234,6 +235,14 @@ const CardCalzadoContent = () => {
 
   useEffect(() => {
     fetchCalzados(currentPage);
+    const listener = EventRegister.addEventListener('reloadMainPage', () => {
+      console.log('Recargando la información...');
+      fetchCalzados(currentPage);
+    });
+
+    return () => {
+      EventRegister.removeEventListener(listener);
+    };
   }, [currentPage]);
 
   const formatDate = (dateString: string) => {
@@ -274,7 +283,7 @@ const CardCalzadoContent = () => {
       
         <ModalCardCalzado/>
         <ModalSearchCalzado />
-        <ModalAddCalzado />
+        {/* <ModalAddCalzado /> */}
       </View>
       {/* Cart Summary */}
       <View style={tw`flex-row justify-between items-center p-4 bg-white border-b border-gray-200`}>
